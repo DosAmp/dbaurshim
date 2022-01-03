@@ -1,0 +1,7 @@
+/Debug/
+/Release/
+# fuck yeah Visual Studio
+*.ncb
+*.opt
+*.plg
+*.aps
