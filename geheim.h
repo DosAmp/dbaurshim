@@ -1,19 +1,24 @@
 #ifndef _INC_DBAURSHIM_GEHEIM
 #define _INC_DBAURSHIM_GEHEIM
 
+#define _DBAURSHIM_SECRET "c|qgzr"
+#define _DBAURSHIM_KEY "WHF"
+
 #ifdef __cplusplus
+
+#include <string>
+
 // wir sind Enterprise, wir nutzen Namespaces in C++
 namespace dbaurshim {
-#endif
+	static const std::string secret(_DBAURSHIM_SECRET);
+	static const std::string key(_DBAURSHIM_KEY);
+}
 
-#define DBAURSHIM_HAS_SECRET
-static const char secret[] = {'c', '|', 'q', 'g', 'z', 'r'};
+#else
 
-#define DBAURSHIM_HAS_KEY
-static const char key[] = "WHF";
+static const char dbaurshim_secret[] = _DBAURSHIM_SECRET;
+static const char dbaurshim_key[] = _DBAURSHIM_KEY;
 
-#ifdef __cplusplus
-} // end namespace
-#endif
+#endif // __cplusplus
 
-#endif
+#endif // _INC_DBAURSHIM_GEHEIM

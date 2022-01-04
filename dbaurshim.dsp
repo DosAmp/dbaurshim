@@ -110,10 +110,6 @@ SOURCE=.\geheim.h
 # Begin Group "Ressourcendateien"
 
 # PROP Default_Filter "ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
-# Begin Source File
-
-SOURCE=.\dbaur.ico
-# End Source File
 # End Group
 # End Target
 # End Project
