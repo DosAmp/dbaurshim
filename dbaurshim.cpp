@@ -1,5 +1,4 @@
 #include <windows.h>
-#include <tchar.h>
 // for StrRChr
 #include <shlwapi.h>
 #include <string>
@@ -16,7 +15,7 @@ static void chdirToExeDir()
 	if(GetModuleFileName(NULL, prog_dir, MAX_PATH)) {
 		TCHAR *lastbs = StrRChr(prog_dir, NULL, TEXT('\\'));
 		// keep backslash to make SetCurrentDirectory happy
-		if (lastbs) *(lastbs + 1) = TEXT('\0');
+		if (lastbs) *++lastbs = 0;
 		SetCurrentDirectory(prog_dir);
 	}
 }
@@ -29,15 +28,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLine,
 	PROCESS_INFORMATION pi;
 
 	// build zero-delimited TSTR
-	tstring prog_args;
-	prog_args.reserve(_tcslen(CHILD) + 2 * secret_size + 2);
-	prog_args.append(CHILD).append(1, TEXT(' '));
+	tstring prog_args = CHILD;
+	prog_args += TEXT(' ');
 	// no cbegin() on C++98
 	for (i = 0; i < secret_size; i++) {
-		prog_args += static_cast<TCHAR>('0' + dbaurshim::secret.at(i) / 16);
-		prog_args += static_cast<TCHAR>('0' + dbaurshim::secret.at(i) % 16);
+		prog_args += static_cast<TCHAR>('0' + dbaurshim::secret[i] / 16);
+		prog_args += static_cast<TCHAR>('0' + dbaurshim::secret[i] % 16);
 	}
-	prog_args.append(1, TEXT('\0'));
+	prog_args += TEXT('\0');
 
 	chdirToExeDir();
 
@@ -45,7 +43,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLine,
 	startmeup.cb = sizeof(startmeup);
 	ZeroMemory(&pi, sizeof(pi));
 
-	// decay to pointer to (mutable) TCHAR for CreateProcessW
+	// decay to pointer to mutable memory for CreateProcessW
 	if (CreateProcess(CHILD, &prog_args[0],
 			NULL, NULL, FALSE, 0, NULL, NULL,
 			&startmeup, &pi)) {
