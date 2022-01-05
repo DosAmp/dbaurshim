@@ -104,7 +104,7 @@ SOURCE=.\version.rc
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
-SOURCE=.\geheim.h
+SOURCE=.\secret.h
 # End Source File
 # End Group
 # Begin Group "Ressourcendateien"

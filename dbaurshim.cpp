@@ -1,12 +1,13 @@
 #include <windows.h>
+#include <tchar.h>
 // for StrRChr
 #include <shlwapi.h>
 #include <string>
-#include "geheim.h"
+#include "secret.h"
 
 typedef std::basic_string<TCHAR> tstring;
 
-static const TCHAR child[] = TEXT("dbaur.exe");
+static const TCHAR CHILD[] = TEXT("dbaur.exe");
 
 static void chdirToExeDir()
 {
@@ -23,18 +24,19 @@ static void chdirToExeDir()
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLine, int nCmdShow)
 {
 	const size_t secret_size = dbaurshim::secret.size();
-	const size_t key_size = dbaurshim::key.size();
 	size_t i;
 	STARTUPINFO startmeup;
 	PROCESS_INFORMATION pi;
 
 	// build zero-delimited TSTR
-	tstring prog_args = child;
-	prog_args.reserve(prog_args.size() + secret_size + 2);
-	prog_args.append(1, TEXT(' '));
+	tstring prog_args;
+	prog_args.reserve(_tcslen(CHILD) + 2 * secret_size + 2);
+	prog_args.append(CHILD).append(1, TEXT(' '));
 	// no cbegin() on C++98
-	for (i = 0; i < secret_size; i++)
-		prog_args += static_cast<TCHAR>(dbaurshim::secret[i] ^ dbaurshim::key[i % key_size]);
+	for (i = 0; i < secret_size; i++) {
+		prog_args += static_cast<TCHAR>('0' + dbaurshim::secret.at(i) / 16);
+		prog_args += static_cast<TCHAR>('0' + dbaurshim::secret.at(i) % 16);
+	}
 	prog_args.append(1, TEXT('\0'));
 
 	chdirToExeDir();
@@ -44,7 +46,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLine,
 	ZeroMemory(&pi, sizeof(pi));
 
 	// decay to pointer to (mutable) TCHAR for CreateProcessW
-	if (CreateProcess(child, &prog_args[0],
+	if (CreateProcess(CHILD, &prog_args[0],
 			NULL, NULL, FALSE, 0, NULL, NULL,
 			&startmeup, &pi)) {
 		CloseHandle(pi.hProcess);
